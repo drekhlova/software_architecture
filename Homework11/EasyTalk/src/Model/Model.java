@@ -1,72 +1,95 @@
 package Model;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Listener.ContactChangeListener;
+import Listener.MessageReceivedListener;
+
 public class Model {
-    private String username;
-    private String phoneNumber;
-    private String password;
-    private List<Chat> chats;
-    private List<User> contacts;
-    // Другие данные о пользователе, чатах и контактах
-
-    // Конструктор
-    public Model(String username, String phoneNumber, String password) {
-        this.username = username;
-        this.phoneNumber = phoneNumber;
-        this.password = password;
-        this.chats = new ArrayList<>();
+    
+    private List<String> contacts;
+    private List<MessageReceivedListener> messageReceivedListeners;
+    private List<ContactChangeListener> contactChangeListeners;
+    
+    public Model() {
         this.contacts = new ArrayList<>();
-        // Инициализация списков чатов и контактов
+        this.messageReceivedListeners = new ArrayList<>();
+        this.contactChangeListeners = new ArrayList<>();
+    }
+    
+    
+    public void registerUser(String username, String password) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("EasyTalk/src/Users.txt", true))) {
+            writer.write(username + ":" + password);
+            writer.newLine();
+        } catch (IOException err) {
+            err.printStackTrace();
+        }
     }
 
-    // Геттеры и сеттеры для доступа к полям
-    // Методы для управления чатами
-    public void addChat(Chat chat) {
-        chats.add(chat);
+    public boolean checkCredentials(String username, String password) {
+        // Проверка данных аутентификации с базой данных
+        // Вернуть true, если данные верны, иначе false
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("EasyTalk/src/Users.txt"));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] userData = line.split(":");
+                if (userData.length == 2 && userData[0].equals(username) && userData[1].equals(password)) {
+                    reader.close();
+                    return true;
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
-    public String getUsername() {
-        return username;
+    public void addContact(String contact) {
+        contacts.add(contact);
+        notifyContactChangeListeners(); // Уведомляем слушателей об изменении списка контактов
     }
-
-    public void setUsername(String username) {
-        this.username = username;
+    
+    public void removeContact(String contact) {
+        contacts.remove(contact);
+        notifyContactChangeListeners(); // Уведомляем слушателей об изменении списка контактов
     }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
+    
+    public void sendMessage(String message) {
+        // Отправка сообщения
+        notifyMessageReceivedListeners(message); // Уведомляем слушателей о получении нового сообщения
     }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    
+    public void exitChat() {
+        // Логика выхода из чата
     }
-
-    public String getPassword() {
-        return password;
+    
+    public void addMessageReceivedListener(MessageReceivedListener listener) {
+        messageReceivedListeners.add(listener);
     }
-
-    public void setPassword(String password) {
-        this.password = password;
+    
+    public void addContactChangeListener(ContactChangeListener listener) {
+        contactChangeListeners.add(listener);
     }
-
-    public void setChats(List<Chat> chats) {
-        this.chats = chats;
+    
+    private void notifyMessageReceivedListeners(String message) {
+        for (MessageReceivedListener listener : messageReceivedListeners) {
+            listener.onMessageReceived(message);
+        }
     }
-
-    public List<User> getContacts() {
-        return contacts;
+    
+    private void notifyContactChangeListeners() {
+        for (ContactChangeListener listener : contactChangeListeners) {
+            listener.onContactChange(contacts);
+        }
     }
-
-    public void setContacts(List<User> contacts) {
-        this.contacts = contacts;
-    }
-
-    public void removeChat(Chat chat) {
-        chats.remove(chat);
-    }
-
-    public List<Chat> getChats() {
-        return chats;
-    }
+    
 }

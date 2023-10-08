@@ -1,42 +1,60 @@
 package Presenter;
 
+import javax.swing.*;
 import javax.swing.text.View;
 
-import Model.Chat;
+import Listener.ContactChangeListener;
+import Listener.MessageReceivedListener;
 import Model.Model;
-import Model.User;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
 public class Presenter {
-    private Model model;
+
     private View view;
-    
-    public Presenter(Model model, View view) {
-        this.model = model;
+    private Model model;
+
+    public Presenter(View view, Model model) {
         this.view = view;
-    }
-    
-    public void startApp() {
-        // Логика начального экрана приложения
-    }
-    
-    public void registerUser(String username, String phoneNumber, String password) {
-        // Логика регистрации нового пользователя
-    }
-    
-    public void loginUser(String phoneNumber, String password) {
-        // Логика входа пользователя
-    }
-    
-    public void openChat(Chat chat) {
-        // Логика открытия чата
-    }
-    
-    public void createChat(User contact) {
-        // Логика создания нового чата
-    }
-    
-    public void editUserProfile(String newUsername, String description) {
-        // Логика редактирования профиля пользователя
+        this.model = model;
+
+        // Добавляем обработчик для кнопки отправки сообщения
+        view.getSendButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String message = view.getMessageField().getText();
+                model.sendMessage(message); // Вызываем метод модели для отправки сообщения
+                view.getMessageField().setText(""); // Очищаем поле ввода сообщения
+            }
+        });
+
+        // Добавляем обработчик для кнопки выхода из чата
+        view.getExitButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.exitChat(); // Вызываем метод модели для выхода из чата
+                view.dispose(); // Закрываем окно чата
+            }
+        });
+
+        // Добавляем обработчик для изменения списка контактов
+        model.addContactChangeListener(new ContactChangeListener() {
+            @Override
+            public void onContactChange(List<String> contacts) {
+                view.updateContactList(contacts); // Вызываем метод представления для обновления списка контактов
+            }
+        });
+
+        // Добавляем обработчик для получения нового сообщения
+        model.addMessageReceivedListener(new MessageReceivedListener() {
+            @Override
+            public void onMessageReceived(String message) {
+                view.displayMessage(message); // Вызываем метод представления для отображения нового сообщения
+            }
+        });
     }
 
 }
