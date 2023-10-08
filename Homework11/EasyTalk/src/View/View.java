@@ -16,7 +16,7 @@ public class View extends JFrame {
 
     
     public View() {
-        setTitle("Мессенджер");
+        setTitle("EasyTalk");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -24,10 +24,10 @@ public class View extends JFrame {
         // Создание компонентов
         JPanel leftPanel = new JPanel(new BorderLayout());
         JPanel leftSouthPanel = new JPanel(new BorderLayout());
-        JLabel chatListLabel = new JLabel("Список чатов:");
+        JLabel chatListLabel = new JLabel("ChatList:");
         chatList = new JList<>();
-        JButton addNewChatButton = new JButton("Добавить новый чат");
-        logoutButton = new JButton("Выход");
+        JButton addNewChatButton = new JButton("New chat");
+        logoutButton = new JButton("Exit");
         JScrollPane chatListScrollPane = new JScrollPane(chatList);
         leftPanel.add(chatListLabel, BorderLayout.NORTH);
         leftPanel.add(chatListScrollPane, BorderLayout.CENTER);
@@ -41,11 +41,11 @@ public class View extends JFrame {
         centerPanel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
-        JLabel messageLabel = new JLabel("Сообщение:");
+        JLabel messageLabel = new JLabel("Message:");
         messageField = new JTextField();
         bottomPanel.add(messageLabel, BorderLayout.WEST);
         bottomPanel.add(messageField, BorderLayout.CENTER);
-        sendButton = new JButton("Отправить");
+        sendButton = new JButton("Send");
         bottomPanel.add(sendButton, BorderLayout.EAST);
 
         // Добавление компонентов на панель
