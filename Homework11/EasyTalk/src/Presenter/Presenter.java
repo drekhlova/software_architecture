@@ -14,12 +14,29 @@ import java.util.List;
 
 public class Presenter {
 
-    private View view;
     private Model model;
+    private View view;
+    
 
-    public Presenter(View view, Model model) {
-        this.view = view;
+    public Presenter(Model model, View view) {
         this.model = model;
+        this.view = view;
+        
+        // Добавляем обработчик для изменения списка контактов
+        model.addContactChangeListener(new ContactChangeListener() {
+            @Override
+            public void onContactChange(List<String> contacts) {
+                view.updateContactList(contacts); // Вызываем метод представления для обновления списка контактов
+            }
+        });
+
+        // Добавляем обработчик для получения нового сообщения
+        model.addMessageReceivedListener(new MessageReceivedListener() {
+            @Override
+            public void onMessageReceived(String message) {
+                view.displayMessage(message); // Вызываем метод представления для отображения нового сообщения
+            }
+        });
 
         // Добавляем обработчик для кнопки отправки сообщения
         view.getSendButton().addActionListener(new ActionListener() {
@@ -40,21 +57,6 @@ public class Presenter {
             }
         });
 
-        // Добавляем обработчик для изменения списка контактов
-        model.addContactChangeListener(new ContactChangeListener() {
-            @Override
-            public void onContactChange(List<String> contacts) {
-                view.updateContactList(contacts); // Вызываем метод представления для обновления списка контактов
-            }
-        });
-
-        // Добавляем обработчик для получения нового сообщения
-        model.addMessageReceivedListener(new MessageReceivedListener() {
-            @Override
-            public void onMessageReceived(String message) {
-                view.displayMessage(message); // Вызываем метод представления для отображения нового сообщения
-            }
-        });
     }
 
 }
